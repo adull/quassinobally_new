@@ -39,19 +39,14 @@ const Quassinobally = () => {
     }
 
     const answersDropFn = (item) => {
-        // console.log(`in parent, item is:`)
-        // console.log(item)
-        const tempLetters = letters
-        console.log({ tempLetters })
-        tempLetters.splice(item.index, 1)
-        console.log({ tempLetters })
-        setLetters(tempLetters)
-        // const tempAnswers = answers
-        // tempAnswers.push(item.value)
-        setAnswers([...answers, item.value])
-        
-        // setLetters(letters.splice(item.index, 1))
-        
+        console.log({ item })
+        // console.log(letters)
+        setAnswers(prevAnswers => [...prevAnswers, item.value])
+        setLetters(prevLetters => { 
+            const tempLetters = [...prevLetters] 
+            tempLetters.splice(item.index, 1)
+            return tempLetters
+        })
     }
 
     return (

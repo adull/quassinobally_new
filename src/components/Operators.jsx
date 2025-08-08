@@ -5,7 +5,7 @@ const Operators = ({ operators }) => {
         <div className="flex">
         {operators.map((item, index) => (
             <div className="mr-2">
-                <Draggable id={index} type={'OPERATOR'}>
+                <Draggable index={index} type={'OPERATORS'} value={item}>
                     {item}
                 </Draggable>
             </div>
