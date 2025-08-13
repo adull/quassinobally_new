@@ -1,9 +1,9 @@
 import { DndProvider } from 'react-dnd'
 import { MultiBackend } from 'dnd-multi-backend'
-import { useEffect, useState } from 'react'
+import { useEffect, useReducer } from 'react'
 import { generate } from 'random-words'
 
-import { OPERATORS } from '../constants'
+import { OPERATORS, ACTIONS } from '../constants'
 
 import HTML5AndTouch from './backends'
 
@@ -13,52 +13,65 @@ import Operators from './Operators'
 import Answers from './Answers'
 
 
-const Quassinobally = () => {
-    const [letters, setLetters] = useState([])
-    const [answers, setAnswers] = useState([])
 
-    const newLetters = () => {
-        setLetters(generate({ minLength:3 , maxLength: 10}).split(''))
+const Quassinobally = () => {
+    const reducer = (state, action) => {
+        if(action.type === ACTIONS.DROP) {
+            const { from, to, item } = action
+    
+            return {
+                ...state,
+                letters: item.to === 'LETTERS' ? lettersDropFn({ from, to, item }) : [...state.letters],
+                operators: OPERATORS,
+                answers: item.to === 'ANSWERS' ? answersDropFn({ from, to, item }) : [...state.answers], 
+    
+            }
+        }
+        throw Error('Unknown action')
+    }
+    
+    const generateLetters = () => {
+        const umm = generate({ minLength:3 , maxLength: 10}).split('').map((character, index) => { return { character, index } })
+        console.log({ umm })
+        return umm
     }
 
+    const [state, dispatch] = useReducer(reducer, {
+        // generate random word between 3 and 10 chars, split, then add an original index to each character
+        letters: generateLetters(),
+        operators: OPERATORS,
+        answers: []
+    })
+
     const clearAnswers = () => {
-        // answersRef.current = []
-        setAnswers([])
+        // something here..
     }
 
     useEffect(() => {
-        newLetters()
+        state.letters = generateLetters()
     }, [])
 
-    const lettersDropFn = (item) => {
-        console.log(`do nothing prolly letters`)
+    const lettersDropFn = ({from, to, item}) => {
+        console.log({from, to, item})        
     }
 
-    const operatorsDropFn = (item) => {
-        console.log(`do nothing prolly operators`)
+    const answersDropFn = ({from, to, item}) => {
+        console.log({from, to, item})
     }
 
-    const answersDropFn = (item) => {
-        console.log({ item })
-        // console.log(letters)
-        setAnswers(prevAnswers => [...prevAnswers, item.value])
-        setLetters(prevLetters => { 
-            const tempLetters = [...prevLetters] 
-            tempLetters.splice(item.index, 1)
-            return tempLetters
-        })
-    }
+    const dropFn = ({from, to, item}) => dispatch({ type: 'DROP', from, to, item });
+
 
     return (
         <DndProvider backend={MultiBackend} options={HTML5AndTouch}>
-            <Box type='letters' dropFn={lettersDropFn} >
-                <Letters letters={letters}  />
+            <Box type='letters' dropFn={dropFn} >
+                <Letters letters={state.letters}  />
             </Box>
-            <Box type='operators' dropFn={operatorsDropFn} >
-                <Operators operators={ OPERATORS } />
+            <Box type='operators' dropFn={dropFn} >
+                <Operators operators={ state.operators } />
             </Box>
-            <Box type='answer' dropFn={answersDropFn} >
-                <Answers answers={ answers }  />
+            <Box type='answer' dropFn={dropFn} >
+                <Answers answers={ state.answers }  />
             </Box>
         </DndProvider>
 	

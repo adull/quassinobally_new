@@ -6,8 +6,8 @@ const Letters = ({ letters }) => {
         <div className="flex">
         {letters.map((letter, index) => (
             <div className="mr-2">
-                <Draggable key={index} index={index} type={'LETTERS'} value={letter}>
-                    {letter}
+                <Draggable key={index} index={letter.index} type={'LETTERS'} value={letter.character}>
+                    {letter.character}
                 </Draggable>
             </div>
 

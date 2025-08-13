@@ -1,3 +1,5 @@
 const OPERATORS = '()+-÷×'.split('')
 
-export { OPERATORS }
+const ACTIONS = { DROP: 'DROP' }
+
+export { OPERATORS, ACTIONS }
