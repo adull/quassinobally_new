@@ -5,12 +5,14 @@ import { createTransition, TouchTransition } from 'dnd-multi-backend'
 const HTML5AndTouch = {
     backends: [
         {
+            id: 0,
             backend: HTML5Backend,
             transition: createTransition('touchstart', () => {
                 return 'ontouchstart' in window || navigator.maxTouchPoints > 0
             })
         },
         {
+            id: 1,
             backend: TouchBackend,
             options: { enableMouseEvents: true },
             preview: true,

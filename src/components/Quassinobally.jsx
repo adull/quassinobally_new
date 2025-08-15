@@ -15,30 +15,69 @@ import Answers from './Answers'
 
 
 const Quassinobally = () => {
+    const lettersDropFn = ({from, to, item}) => {
+        console.log({from, to, item})        
+    }
+
+    const answersDropFn = ({from, to, item, state}) => {
+        const {letters, operators, answers } = state
+        if(from === 'LETTERS') {
+            // console.log(state.letters)
+            const arrIndex = letters.findIndex(letter => letter.index === item.index)
+            console.log(arrIndex)
+            if(arrIndex > -1) {
+                letters.splice(arrIndex, 1)
+            }
+        }
+        return {
+            ...state,
+            letters: letters,
+            operators: operators,
+            answers: [...answers, {answerChar: item.value, index: item.index, type: item.type}]
+        }
+        
+    }
+
     const reducer = (state, action) => {
-        if(action.type === ACTIONS.DROP) {
-            const { from, to, item } = action
-    
+        const { from, to, item, type } = action
+        if(type === ACTIONS.INIT) {
             return {
                 ...state,
-                letters: item.to === 'LETTERS' ? lettersDropFn({ from, to, item }) : [...state.letters],
-                operators: OPERATORS,
-                answers: item.to === 'ANSWERS' ? answersDropFn({ from, to, item }) : [...state.answers], 
+                letters: generateLetters(),
+                operators: [...state.operators],
+                answers:  [...state.answers], 
     
             }
+        }
+        else if(type === ACTIONS.DROP) {
+            if(to === 'LETTERS') {
+                return lettersDropFn({ from, to, item, state })
+            } else if(to === 'ANSWERS') {
+                return answersDropFn({ from, to, item,  state })
+            } else {
+                return {
+                    ...state
+                }
+            }
+            // return {
+            //     ...state,
+            //     letters: to === 'LETTERS' ? [lettersDropFn({ from, to, item })] : [...state.letters],
+            //     operators: OPERATORS,
+            //     answers: to === 'ANSWERS' ? answersDropFn({ from, to, item, answers: state.answers }) : [...state.answers], 
+            // }
         }
         throw Error('Unknown action')
     }
     
     const generateLetters = () => {
-        const umm = generate({ minLength:3 , maxLength: 10}).split('').map((character, index) => { return { character, index } })
-        console.log({ umm })
-        return umm
+        const letters = generate({ minLength:3 , maxLength: 10}).split('').map((character, index) => { return { character, index } })
+        // console.log({ letters })
+        return letters
     }
 
     const [state, dispatch] = useReducer(reducer, {
         // generate random word between 3 and 10 chars, split, then add an original index to each character
-        letters: generateLetters(),
+        letters: [],
         operators: OPERATORS,
         answers: []
     })
@@ -48,29 +87,29 @@ const Quassinobally = () => {
     }
 
     useEffect(() => {
-        state.letters = generateLetters()
+        console.log(`useeffect[]`)
+        dispatch({ type: 'INIT' })
+        // state.letters = generateLetters()
     }, [])
 
-    const lettersDropFn = ({from, to, item}) => {
-        console.log({from, to, item})        
-    }
+    
 
-    const answersDropFn = ({from, to, item}) => {
-        console.log({from, to, item})
+    const dropFn = ({ from, to, item }) => {
+        console.log('dropfn just called ')
+        // console.log({ from, to, item })
+        return dispatch({ type: 'DROP', from, to, item });
     }
-
-    const dropFn = ({from, to, item}) => dispatch({ type: 'DROP', from, to, item });
 
 
     return (
         <DndProvider backend={MultiBackend} options={HTML5AndTouch}>
-            <Box type='letters' dropFn={dropFn} >
+            <Box type='LETTERS' dropFn={dropFn} >
                 <Letters letters={state.letters}  />
             </Box>
-            <Box type='operators' dropFn={dropFn} >
+            <Box type='OPERATORS' dropFn={dropFn} >
                 <Operators operators={ state.operators } />
             </Box>
-            <Box type='answer' dropFn={dropFn} >
+            <Box type='ANSWERS' dropFn={dropFn} >
                 <Answers answers={ state.answers }  />
             </Box>
         </DndProvider>

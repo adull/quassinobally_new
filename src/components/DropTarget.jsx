@@ -1,12 +1,13 @@
 import { useDrop } from 'react-dnd'
 
-function DropTarget({ accept, dropFn, children  }) {
+function DropTarget({ type, accept, dropFn, children  }) {
+    // console.log(accept, children)
     const [collectedProps, drop] = useDrop(() => ({
         accept,
         drop: (item, monitor) => {
-            // console.log('dropped item:')
-            // console.log(item)
-            dropFn(item)
+            console.log('dropped item:')
+            console.log(item)
+            dropFn({from: item.currentPos, to: type, item})
             // console.log(monitor)
             return undefined
         },

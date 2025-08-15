@@ -1,9 +1,9 @@
 import { useDrag } from 'react-dnd'
 
-function Draggable({ index, type, value, children }) {
+function Draggable({ index, type, currentPos, value, children }) {
     const [{isDragging}, drag] = useDrag(() => ({
     type,
-    item: { index, type, value },
+    item: { index, type, currentPos, value },
     collect: monitor => ({
       isDragging: !!monitor.isDragging(),
     }),
